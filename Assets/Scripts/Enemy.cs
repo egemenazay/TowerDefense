@@ -2,27 +2,27 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public float speed = 3f;
-
-    [SerializeField] private Transform targetTower;
+    public float speed = 5f;
+    public float stoppingDistance = 1.5f; // Distance at which the unit stops
+    private Transform currentTargetTower;
 
     void Update()
     {
-        //FindClosestTower();
-        
-        if (targetTower != null)
-        {
-            // Move towards the target tower
-            transform.position = Vector3.MoveTowards(transform.position, targetTower.position, speed * Time.deltaTime);
+        FindClosestTower();
 
-            // Optional: Rotate to face the target
-            Vector3 direction = (targetTower.position - transform.position).normalized;
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+        if (currentTargetTower != null)
+        {
+            float distance = Vector3.Distance(transform.position, currentTargetTower.position);
+
+            if (distance > stoppingDistance)
+            {
+                // Move towards the tower
+                MoveTowardsTower();
+            }
         }
     }
 
-    /*void FindClosestTower()
+    void FindClosestTower()
     {
         float closestDistance = Mathf.Infinity;
         Transform closestTower = null;
@@ -37,6 +37,16 @@ public class Enemy : MonoBehaviour
             }
         }
 
-        targetTower = closestTower;
-    }*/
+        currentTargetTower = closestTower;
+    }
+
+    void MoveTowardsTower()
+    {
+        Vector3 direction = (currentTargetTower.position - transform.position).normalized;
+        transform.position += direction * speed * Time.deltaTime;
+
+        // Optional: Rotate towards the target tower
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
+    }
 }
