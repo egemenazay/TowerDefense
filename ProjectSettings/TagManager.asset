@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - GameManager
+  - Enemy
+  - Ground
+  - Cannon
   layers:
   - Default
   - TransparentFX

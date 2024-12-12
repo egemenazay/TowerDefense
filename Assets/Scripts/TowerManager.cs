@@ -2,13 +2,13 @@ using UnityEngine;
 using System.Collections.Generic;
 public class TowerManager : MonoBehaviour
 {
-    public static TowerManager Instance;
+    public static TowerManager TowerManagerInstance;
     public List<Transform> towers = new List<Transform>();
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
+        if (TowerManagerInstance == null)
+            TowerManagerInstance = this;
         else
             Destroy(gameObject);
     }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -5,6 +6,12 @@ public class Enemy : MonoBehaviour
     public float speed = 5f;
     public float stoppingDistance = 1.5f; // Distance at which the unit stops
     private Transform currentTargetTower;
+    public ObjectPool objectPool;
+
+    private void Start()
+    {
+        objectPool = FindObjectOfType<ObjectPool>();
+    }
 
     void Update()
     {
@@ -21,13 +28,12 @@ public class Enemy : MonoBehaviour
             }
         }
     }
-
     void FindClosestTower()
     {
         float closestDistance = Mathf.Infinity;
         Transform closestTower = null;
 
-        foreach (Transform tower in TowerManager.Instance.towers)
+        foreach (Transform tower in TowerManager.TowerManagerInstance.towers)
         {
             float distance = Vector3.Distance(transform.position, tower.position);
             if (distance < closestDistance)
@@ -36,7 +42,6 @@ public class Enemy : MonoBehaviour
                 closestTower = tower;
             }
         }
-
         currentTargetTower = closestTower;
     }
 
@@ -48,5 +53,13 @@ public class Enemy : MonoBehaviour
         // Optional: Rotate towards the target tower
         Quaternion lookRotation = Quaternion.LookRotation(direction);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("Cannon"))
+        {
+            gameObject.SetActive(false);
+        }
     }
 }
