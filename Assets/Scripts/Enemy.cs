@@ -55,11 +55,19 @@ public class Enemy : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
     }
 
-    private void OnCollisionEnter(Collision other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Cannon"))
         {
-            gameObject.SetActive(false);
+            KillEnemy();
+            other.gameObject.SetActive(false);
         }
+    }
+
+    private void KillEnemy()
+    {
+        Debug.Log("ENEMY HIT");
+        objectPool.ReturnEnemy(gameObject);
+        EnemyManager.EnemyManagerInstance.UnregisterEnemy(gameObject.transform);
     }
 }

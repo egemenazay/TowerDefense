@@ -6,9 +6,9 @@ using UnityEngine.Rendering.Universal;
 public class Tower : MonoBehaviour
 {
     [SerializeField] private GameObject cannon;
-    public static Transform currentTargetEnemy;
+    public static GameObject currentTargetEnemy;
     public Transform firePoint;
-    public float towerRange = 10f;
+    public static float towerRange = 10f;
     public float fireRate = 1f; // Time between shots in seconds
     private float fireCooldown = 0f;
     
@@ -20,13 +20,9 @@ public class Tower : MonoBehaviour
             fireCooldown -= Time.deltaTime;
         }
         FindCLosestEnemy();
-        if (currentTargetEnemy == null)
+        if (currentTargetEnemy.transform != null)
         {
-            FindCLosestEnemy();
-        }
-        if (currentTargetEnemy != null)
-        {
-            float distance = Vector3.Distance(transform.position, currentTargetEnemy.position);
+            float distance = Vector3.Distance(transform.position, currentTargetEnemy.transform.position);
 
             if (distance < towerRange)
             {
@@ -53,19 +49,19 @@ public class Tower : MonoBehaviour
                 closestEnemy = enemy;
             }
         }
-        currentTargetEnemy = closestEnemy;
+        currentTargetEnemy = closestEnemy.gameObject;
     }
     private void FireCannon()
     {
         Instantiate(cannon, firePoint.position, firePoint.rotation);
     }
-    private void OnEnable()
-    {
-        TowerManager.TowerManagerInstance.RegisterTower(transform);
-    }
 
     private void OnDisable()
     {
         TowerManager.TowerManagerInstance.UnregisterTower(transform);
+    }
+    private void OnEnable()
+    {
+        TowerManager.TowerManagerInstance.RegisterTower(transform);
     }
 }
