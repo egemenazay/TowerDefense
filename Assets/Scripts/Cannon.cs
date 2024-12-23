@@ -37,7 +37,13 @@ public class Cannon : MonoBehaviour
         {
             transform.position += enemyLastDirection * (speed * Time.deltaTime);
         }
+    }
 
-        
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            Destroy(gameObject);
+        }
     }
 }

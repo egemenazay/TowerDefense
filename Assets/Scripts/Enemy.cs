@@ -6,8 +6,9 @@ public class Enemy : MonoBehaviour
     public float speed = 5f;
     public float stoppingDistance = 1.5f; // Distance at which the unit stops
     private Transform currentTargetTower;
-    public ObjectPool objectPool;
+    [SerializeField] public ObjectPool objectPool;
 
+    [Obsolete("Obsolete")]
     private void Start()
     {
         objectPool = FindObjectOfType<ObjectPool>();
@@ -60,7 +61,7 @@ public class Enemy : MonoBehaviour
         if (other.gameObject.CompareTag("Cannon"))
         {
             KillEnemy();
-            other.gameObject.SetActive(false);
+            Destroy(other.gameObject);
         }
     }
 

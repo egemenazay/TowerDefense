@@ -20,7 +20,7 @@ public class Tower : MonoBehaviour
             fireCooldown -= Time.deltaTime;
         }
         FindCLosestEnemy();
-        if (currentTargetEnemy.transform != null)
+        if (currentTargetEnemy != null && currentTargetEnemy.transform != null)
         {
             float distance = Vector3.Distance(transform.position, currentTargetEnemy.transform.position);
 
@@ -49,7 +49,7 @@ public class Tower : MonoBehaviour
                 closestEnemy = enemy;
             }
         }
-        currentTargetEnemy = closestEnemy.gameObject;
+        if (closestEnemy != null) currentTargetEnemy = closestEnemy.gameObject;
     }
     private void FireCannon()
     {
