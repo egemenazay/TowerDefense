@@ -11,6 +11,7 @@ public class Tower : MonoBehaviour
     public static float towerRange = 10f;
     public float fireRate = 1f; // Time between shots in seconds
     private float fireCooldown = 0f;
+    private float health = 20f;
     
 
     private void Update()
@@ -20,6 +21,7 @@ public class Tower : MonoBehaviour
             fireCooldown -= Time.deltaTime;
         }
         FindCLosestEnemy();
+        Debug.Log(health);
         if (currentTargetEnemy != null && currentTargetEnemy.transform != null)
         {
             float distance = Vector3.Distance(transform.position, currentTargetEnemy.transform.position);
@@ -32,6 +34,11 @@ public class Tower : MonoBehaviour
                     fireCooldown = fireRate;
                 }
             }
+        }
+
+        if (health<0)
+        {
+            Destroy(gameObject);
         }
     }
 
@@ -50,6 +57,19 @@ public class Tower : MonoBehaviour
             }
         }
         if (closestEnemy != null) currentTargetEnemy = closestEnemy.gameObject;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            InvokeRepeating(nameof(HealthDecrease), 0f , 1f);
+        }
+    }
+
+    private void HealthDecrease()
+    {
+        health--;
     }
     private void FireCannon()
     {

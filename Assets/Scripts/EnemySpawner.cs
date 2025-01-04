@@ -3,21 +3,17 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public ObjectPool objectPool;
-    public Transform spawnLocation;
+    public GameObject enemyPrefab;
+    public float spawnRate = 5f;
     private void Start()
     {
-        InvokeRepeating(nameof(SpawnOEnemy),0f, 5f);
+        InvokeRepeating(nameof(SpawnOEnemy),0f, spawnRate);
     }
 
     private void SpawnOEnemy()
     {
-        GameObject obj = objectPool.GetEnemy();
-        if (obj != null)
-        {
-            obj.transform.position = spawnLocation.position;
-        }
-        EnemyManager.EnemyManagerInstance.RegisterEnemy(obj.transform);
+        GameObject obj = enemyPrefab;
+        Instantiate(obj, gameObject.transform.position, obj.transform.rotation);
     }
 
 }

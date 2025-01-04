@@ -1,34 +1,43 @@
 using System;
 using UnityEngine;
-
+using UnityEngine.AI;
 public class Enemy : MonoBehaviour
 {
     public float speed = 5f;
-    public float stoppingDistance = 1.5f; // Distance at which the unit stops
+    public float health = 2f;
+    public float stoppingDistance = 25f; // Distance to stop
     private Transform currentTargetTower;
-    [SerializeField] public ObjectPool objectPool;
+    private NavMeshAgent agent;
 
-    [Obsolete("Obsolete")]
-    private void Start()
+    private void Awake()
     {
-        objectPool = FindObjectOfType<ObjectPool>();
+        // Get or add the NavMeshAgent component
+        agent = GetComponent<NavMeshAgent>();
+        if (agent == null)
+            agent = gameObject.AddComponent<NavMeshAgent>();
+
+        agent.speed = speed;
+        agent.stoppingDistance = stoppingDistance;
+        agent.autoBraking = true; // Smoothly stop near the target
     }
 
-    void Update()
+    private void Update()
     {
         FindClosestTower();
 
         if (currentTargetTower != null)
         {
-            float distance = Vector3.Distance(transform.position, currentTargetTower.position);
+            agent.SetDestination(currentTargetTower.position);
 
-            if (distance > stoppingDistance)
+            // Check if the agent is near the stopping distance
+            if (agent.remainingDistance <= agent.stoppingDistance && !agent.pathPending)
             {
-                // Move towards the tower
-                MoveTowardsTower();
+                // Look at the tower when stopped
+                LookAtTarget();
             }
         }
     }
+
     void FindClosestTower()
     {
         float closestDistance = Mathf.Infinity;
@@ -46,29 +55,46 @@ public class Enemy : MonoBehaviour
         currentTargetTower = closestTower;
     }
 
-    void MoveTowardsTower()
+    private void LookAtTarget()
     {
         Vector3 direction = (currentTargetTower.position - transform.position).normalized;
-        transform.position += direction * speed * Time.deltaTime;
 
-        // Optional: Rotate towards the target tower
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
+        // Ignore changes in the Y-axis to prevent tilting
+        direction.y = 0;
+
+        if (direction.magnitude > 0)
+        {
+            // Smoothly rotate to face the target
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+        }
     }
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Cannon"))
         {
-            KillEnemy();
+            health--;
             Destroy(other.gameObject);
+            if (health <= 0)
+            {
+                KillEnemy();
+            }
         }
     }
 
     private void KillEnemy()
     {
-        Debug.Log("ENEMY HIT");
-        objectPool.ReturnEnemy(gameObject);
-        EnemyManager.EnemyManagerInstance.UnregisterEnemy(gameObject.transform);
+        Destroy(gameObject);
+        EnemyManager.EnemyManagerInstance.UnregisterEnemy(transform);
+    }
+
+    private void OnDisable()
+    {
+        EnemyManager.EnemyManagerInstance.UnregisterEnemy(transform);
+    }
+
+    private void OnEnable()
+    {
+        EnemyManager.EnemyManagerInstance.RegisterEnemy(transform);
     }
 }

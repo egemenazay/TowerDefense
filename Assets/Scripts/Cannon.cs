@@ -17,12 +17,11 @@ public class Cannon : MonoBehaviour
     private void Update()
     {
         MoveEnemy();
-        Debug.Log(distance.ToString());
     }
 
     private void MoveEnemy()
     {
-        if (enemy.activeSelf)
+        if (enemy)
         {
             distance = Vector3.Distance(gameObject.transform.position, enemy.transform.position); // cannon topu ile düşman arasındaki mesafe
             enemyLastDirection = enemy.transform.position - transform.position;
